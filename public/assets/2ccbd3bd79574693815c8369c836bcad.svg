@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 60" width="280" height="60" fill="none">
+  <!-- Lamp / Deepam Icon -->
+  <g transform="translate(10, 6)">
+    <!-- Base / Peedam -->
+    <path d="M12 42 C12 45, 36 45, 36 42 L33 38 C33 37, 15 37, 15 38 Z" fill="#CA8A04"/>
+    <path d="M20 38 L20 28 L28 28 L28 38 Z" fill="#B45309"/>
+    <!-- Diya Bowl -->
+    <path d="M10 26 C10 32, 38 32, 38 26 C36 24, 12 24, 10 26 Z" fill="#EAB308"/>
+    <!-- Wick holder & Flame -->
+    <path d="M24 8 C22 14, 19 18, 19 22 C19 25, 29 25, 29 22 C29 18, 26 14, 24 8 Z" fill="#DC2626"/>
+    <path d="M24 13 C23 16, 21 19, 21 22 C21 24, 27 24, 27 22 C27 19, 25 16, 24 13 Z" fill="#FDE047"/>
+    <!-- Subtle aura -->
+    <circle cx="24" cy="18" r="14" fill="#F59E0B" opacity="0.18"/>
+  </g>
+  <!-- Text Brand -->
+  <text x="64" y="27" font-family="'Cinzel', 'Playfair Display', Georgia, serif" font-size="20" font-weight="700" fill="#7F1D1D" letter-spacing="1">DIVINE HOMAM</text>
+  <text x="65" y="42" font-family="sans-serif" font-size="10" font-weight="600" fill="#991B1B" letter-spacing="2">HOMAM &amp; POOJA SEVA</text>
+  <text x="65" y="52" font-family="sans-serif" font-size="8.5" font-weight="500" fill="#B45309" letter-spacing="1">TAMIL NADU VEDIC TRADITIONS</text>
+</svg>

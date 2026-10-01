@@ -1,0 +1,17 @@
+{
+  "name": "divine-homam",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "node scripts/generate-seva-pages.mjs && tailwindcss -i src/styles.css -o public/styles.css --minify",
+    "dev": "npm run build && node server.mjs",
+    "start": "node server.mjs",
+    "check": "node --check public/app.js && node --check server.mjs",
+    "test:browser": "node scripts/acceptance.mjs"
+  },
+  "devDependencies": {
+    "@tailwindcss/forms": "^0.5.11",
+    "playwright": "^1.63.0",
+    "tailwindcss": "^3.4.19"
+  }
+}
