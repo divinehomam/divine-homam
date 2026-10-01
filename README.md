@@ -21,7 +21,13 @@ Seva page content is maintained in `src/sevas.json`. `npm run build` generates o
 
 The Node server validates requests and saves them privately as JSON in `data/bookings/`. Repeating the same submission uses an idempotency key to avoid duplicates. There is no public endpoint exposing requests. To use another storage directory set `BOOKINGS_DIR`; `HOST` and `PORT` are also configurable.
 
-This is a local working implementation. It does not send emails, WhatsApp messages, process payments, assign priests, or confirm availability. Before public launch, connect durable production storage and coordinator notifications, configure HTTPS and abuse protection, and replace the source design's placeholder phone/WhatsApp number. Publish real privacy and booking policies. Source testimonials, certification statements, and ritual safety claims are retained as requested and need the owner's review. The source's first-card photo count is retained; only one photo per ceremony was supplied.
+On Vercel, `/api/bookings` is deployed as a Node.js Function and booking JSON is stored in a **private Vercel Blob store**. Create a Blob store from the Vercel project Storage tab and connect it to the project so `BLOB_READ_WRITE_TOKEN` is available to Production and Preview deployments. Booking details contain personal information and must stay in private storage. For local development, `server.mjs` continues to save records under `data/bookings/`.
+
+## Deploy to Vercel
+
+Import `divinehomam/divine-homam` in Vercel. The included `vercel.json` selects the Other framework preset, runs `npm run build`, and publishes `public/`. The `api/bookings.js` function is deployed with the site. Connect a private Vercel Blob store before accepting bookings; without its `BLOB_READ_WRITE_TOKEN`, submissions return an error. Pushes to the connected Git branch trigger new deployments.
+
+The site does not send emails, process payments, assign priests, or confirm availability. Publish real privacy and booking policies. Source testimonials, certification statements, and ritual safety claims are retained as requested and need the owner's review. The source's first-card photo count is retained; only one photo per ceremony was supplied.
 
 ## Motion
 
