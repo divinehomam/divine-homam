@@ -779,9 +779,6 @@ html.motion-paused .lamp-glow {
     transform: none !important
   }
 
-  .hero-video {
-    display: none
-  }
 }
 
 .service-details-link {
