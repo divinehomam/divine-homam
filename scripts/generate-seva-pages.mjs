@@ -10,6 +10,15 @@ const escapeHtml = value => String(value).replace(/[&<>"']/g, character => ({
   '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
 })[character]);
 const escapeRegExp = value => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const siteUrl = 'https://www.divinehomam.com';
+const jsonLd = value => JSON.stringify(value).replaceAll('<', '\\u003c');
+const seoDescription = summary => {
+  const suffix = ' Discuss this ceremony with Divine Homam.';
+  const maxSummaryLength = 160 - suffix.length;
+  if (summary.length <= maxSummaryLength) return `${summary}${suffix}`;
+  const shortened = summary.slice(0, maxSummaryLength - 1).replace(/\s+\S*$/, '');
+  return `${shortened.trim()}…${suffix}`;
+};
 
 await mkdir(output, { recursive: true });
 let homePage = await readFile(homePagePath, 'utf8');
@@ -18,6 +27,9 @@ const eol = homePage.includes('\r\n') ? '\r\n' : '\n';
 for (const seva of services) {
   const title = escapeHtml(seva.title);
   const summary = escapeHtml(seva.summary);
+  const metaDescription = escapeHtml(seoDescription(seva.summary));
+  const rawPageTitle = `${seva.title} | Divine Homam`;
+  const pageTitle = escapeHtml(rawPageTitle.length <= 60 ? rawPageTitle : seva.title);
   const bookingValue = seva.bookingValue || seva.title;
   const detailMarker = `data-seva-detail="${seva.slug}"`;
   if (!homePage.includes(detailMarker)) {
@@ -72,14 +84,37 @@ for (const seva of services) {
       <ul class="seva-benefits-list">${benefits}
       </ul>
     </section>` : '';
+  const canonicalUrl = `${siteUrl}/puja/${seva.slug}`;
+  const pageSchema = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      { '@type': 'Service', '@id': `${canonicalUrl}#service`, name: seva.title, serviceType: seva.title, description: seva.summary, provider: { '@id': `${siteUrl}/#organization` }, areaServed: { '@type': 'AdministrativeArea', name: 'Tamil Nadu, India' }, url: canonicalUrl, image: seva.image ? `${siteUrl}${seva.image}` : undefined },
+      { '@type': 'BreadcrumbList', itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: `${siteUrl}/` },
+        { '@type': 'ListItem', position: 2, name: 'Poojas and Homams', item: `${siteUrl}/#poojas` },
+        { '@type': 'ListItem', position: 3, name: seva.title, item: canonicalUrl }
+      ] }
+    ]
+  };
   const page = `<!doctype html>
 <html lang="en-IN">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="${summary} Learn about duration, inclusions, and how to request ${title} with Divine Homam.">
+  <meta name="description" content="${metaDescription}">
   <meta name="theme-color" content="#fffdf7">
-  <title>${title} | Divine Homam</title>
+  <title>${pageTitle}</title>
+  <link rel="canonical" href="${canonicalUrl}">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Divine Homam">
+  <meta property="og:title" content="${pageTitle}">
+  <meta property="og:description" content="${metaDescription}">
+  <meta property="og:url" content="${canonicalUrl}">
+  ${seva.image ? `<meta property="og:image" content="${siteUrl}${escapeHtml(seva.image)}">` : ''}
+  <meta name="twitter:card" content="${seva.image ? 'summary_large_image' : 'summary'}">
+  <meta name="twitter:title" content="${pageTitle}">
+  <meta name="twitter:description" content="${metaDescription}">
+  <script type="application/ld+json">${jsonLd(pageSchema)}</script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">

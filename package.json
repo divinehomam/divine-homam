@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "build": "node scripts/generate-seva-pages.mjs && tailwindcss -i src/styles.css -o public/styles.css --minify",
+    "build": "node scripts/generate-seva-pages.mjs && node scripts/generate-seo.mjs && tailwindcss -i src/styles.css -o public/styles.css --minify",
     "vercel-build": "npm run build",
     "dev": "npm run build && node server.mjs",
     "start": "node server.mjs",

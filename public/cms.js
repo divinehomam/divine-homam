@@ -6,12 +6,30 @@ const isPujaImage = value => {
   try { const image = new URL(value); return image.protocol === 'https:' && image.hostname === 'res.cloudinary.com' && /^\/[^/]+\/image\/upload\//.test(image.pathname); } catch { return false; }
 };
 const listPoints = points => (Array.isArray(points) ? points : []).map(point => `<li><span class="material-symbols-outlined" aria-hidden="true">check_circle</span><span>${esc(point)}</span></li>`).join('');
+const setMeta = (selector, attribute, key, value) => {
+  let element = document.head.querySelector(selector);
+  if (!element) { element = document.createElement('meta'); element.setAttribute(attribute, key); document.head.append(element); }
+  element.content = value;
+};
+const setCanonical = href => {
+  let element = document.head.querySelector('link[rel="canonical"]');
+  if (!element) { element = document.createElement('link'); element.rel = 'canonical'; document.head.append(element); }
+  element.href = href;
+};
+const seoTitle = name => { const title = `${name} | Divine Homam`; return title.length <= 60 ? title : name; };
+const seoDescription = summary => {
+  const suffix = ' Discuss this ceremony with Divine Homam.';
+  const maxSummaryLength = 160 - suffix.length;
+  if (summary.length <= maxSummaryLength) return `${summary}${suffix}`;
+  return `${summary.slice(0, maxSummaryLength - 1).replace(/\s+\S*$/, '').trim()}…${suffix}`;
+};
 function card(puja) {
   const images = Array.isArray(puja.image_urls) ? puja.image_urls.filter(isPujaImage) : [];
   const primaryImage = images[0] || (isPujaImage(puja.image_url) ? puja.image_url : '');
   const image = primaryImage ? `<img src="${esc(primaryImage)}" alt="${esc(puja.image_alt || puja.title)}" loading="lazy" decoding="async">` : '<div class="cms-image-placeholder"><span aria-hidden="true">✦</span><small>No images added</small></div>';
   const types = `${/homam/i.test(puja.title) ? 'homam' : ''} ${/family|griha|vratham|pooja|60th|70th/i.test(puja.title) ? 'family' : ''} ${/shanti|dosha|mandala/i.test(puja.title) ? 'shanti' : ''}`.trim();
-  return `<article class="pooja-card cms-card" data-type="${types}"><div class="cms-card-image">${image}<span class="cms-badge">${esc(puja.badge_text)}</span></div><div class="cms-card-body"><div class="cms-facts"><span>${esc(puja.package_type)}</span><span>◷ ${esc(puja.duration)}</span></div><h3 class="cms-title">${esc(puja.title)}</h3><p class="cms-tamil" lang="ta">${esc(puja.tamil_subtitle)}</p><p class="cms-description">${esc(puja.short_description)}</p><ul class="cms-points">${listPoints(puja.points)}</ul><div class="cms-package"><span>Package type</span><strong>${esc(puja.package_type)}</strong></div><a class="service-details-link" href="/pooja.html?slug=${encodeURIComponent(puja.slug)}">View details</a><button class="cms-book" type="button" data-book="${esc(puja.title)}">Book This Seva</button></div></article>`;
+  const detailUrl = `/puja/${encodeURIComponent(puja.slug)}`;
+  return `<article class="pooja-card cms-card" data-type="${types}"><div class="cms-card-image">${image}<span class="cms-badge">${esc(puja.badge_text)}</span></div><div class="cms-card-body"><div class="cms-facts"><span>${esc(puja.package_type)}</span><span>◷ ${esc(puja.duration)}</span></div><h3 class="cms-title">${esc(puja.title)}</h3><p class="cms-tamil" lang="ta">${esc(puja.tamil_subtitle)}</p><p class="cms-description">${esc(puja.short_description)}</p><ul class="cms-points">${listPoints(puja.points)}</ul><div class="cms-package"><span>Package type</span><strong>${esc(puja.package_type)}</strong></div><a class="service-details-link" href="${detailUrl}">View details</a><button class="cms-book" type="button" data-book="${esc(puja.title)}">Book This Seva</button></div></article>`;
 }
 async function loadPujas() {
   const grid = document.querySelector('#poojaGrid');
@@ -45,20 +63,54 @@ document.querySelectorAll('.tab-btn').forEach(button => button.addEventListener(
 
 if (document.body.dataset.page === 'pooja') {
   (async () => {
-    const slug = new URLSearchParams(location.search).get('slug');
+    const slug = new URLSearchParams(location.search).get('slug') || location.pathname.match(/^\/puja\/([a-z0-9-]+)\/?$/)?.[1];
     const main = document.querySelector('#poojaDetail');
     try {
       const response = await fetch('/api/pujas'); if (!response.ok) throw new Error();
       const puja = (await response.json()).find(item => item.slug === slug);
       if (!puja) throw new Error();
-      document.title = `${puja.title} | Divine Homam`;
+      document.title = seoTitle(puja.title);
       const images = Array.isArray(puja.image_urls) ? puja.image_urls.filter(isPujaImage) : [];
       if (!images.length && isPujaImage(puja.image_url)) images.push(puja.image_url);
+      const title = document.title;
+      const description = seoDescription(puja.short_description);
+      const canonical = new URL(`/puja/${encodeURIComponent(puja.slug)}`, location.origin).href;
+      const imageUrl = new URL(images[0] || '/assets/2e71a214000f40a2ac8d5eb090f599c0.png', location.origin).href;
+      setCanonical(canonical);
+      setMeta('meta[name="description"]', 'name', 'description', description);
+      setMeta('meta[property="og:type"]', 'property', 'og:type', 'website');
+      setMeta('meta[property="og:site_name"]', 'property', 'og:site_name', 'Divine Homam');
+      setMeta('meta[property="og:title"]', 'property', 'og:title', title);
+      setMeta('meta[property="og:description"]', 'property', 'og:description', description);
+      setMeta('meta[property="og:url"]', 'property', 'og:url', canonical);
+      setMeta('meta[property="og:image"]', 'property', 'og:image', imageUrl);
+      setMeta('meta[name="twitter:card"]', 'name', 'twitter:card', 'summary_large_image');
+      setMeta('meta[name="twitter:title"]', 'name', 'twitter:title', title);
+      setMeta('meta[name="twitter:description"]', 'name', 'twitter:description', description);
+      setMeta('meta[name="twitter:image"]', 'name', 'twitter:image', imageUrl);
+      const schema = {
+        '@context': 'https://schema.org',
+        '@graph': [
+          { '@type': 'Service', '@id': `${canonical}#service`, name: puja.title, serviceType: puja.title, description: puja.short_description, provider: { '@id': `${location.origin}/#organization` }, areaServed: { '@type': 'AdministrativeArea', name: 'Tamil Nadu, India' }, url: canonical, image: imageUrl },
+          { '@type': 'BreadcrumbList', itemListElement: [
+            { '@type': 'ListItem', position: 1, name: 'Home', item: `${location.origin}/` },
+            { '@type': 'ListItem', position: 2, name: 'Poojas and Homams', item: `${location.origin}/#poojas` },
+            { '@type': 'ListItem', position: 3, name: puja.title, item: canonical }
+          ] }
+        ]
+      };
+      let schemaElement = document.head.querySelector('script[data-cms-schema]');
+      if (!schemaElement) { schemaElement = document.createElement('script'); schemaElement.type = 'application/ld+json'; schemaElement.dataset.cmsSchema = 'true'; document.head.append(schemaElement); }
+      schemaElement.textContent = JSON.stringify(schema).replaceAll('<', '\\u003c');
       const gallery = images.length
         ? images.map((url, index) => `<figure class="cms-detail-photo${index === 0 ? ' cms-detail-feature' : ''}"><img src="${esc(url)}" alt="${esc(puja.image_alt || `${puja.title} photo ${index + 1}`)}" loading="${index === 0 ? 'eager' : 'lazy'}" decoding="async"></figure>`).join('')
         : '<div class="cms-image-placeholder cms-detail-image"><span aria-hidden="true">✦</span><small>No images added</small></div>';
       main.innerHTML = `<nav class="seva-breadcrumb"><a href="/">Home</a><span>/</span><a href="/#poojas">Sevas</a><span>/</span><span>${esc(puja.title)}</span></nav><section class="seva-detail-hero"><div class="seva-detail-copy"><p class="seva-eyebrow">${esc(puja.badge_text)}</p><h1>${esc(puja.title)}</h1><p class="cms-tamil" lang="ta">${esc(puja.tamil_subtitle)}</p><p class="seva-intro">${esc(puja.short_description)}</p><div class="seva-hero-facts"><div><span>Package type</span><strong>${esc(puja.package_type)}</strong></div><div><span>Duration</span><strong>${esc(puja.duration)}</strong></div></div><a class="seva-button" href="/?seva=${encodeURIComponent(puja.title)}#booking-form">Request this Seva →</a></div><div class="cms-detail-visual"><div class="cms-detail-gallery">${gallery}</div></div></section><section class="seva-information"><div class="seva-information-copy"><p class="seva-eyebrow">About this Seva</p><h2>${esc(puja.title)}</h2><p>${esc(puja.short_description)}</p></div><aside class="seva-inclusions-card"><p class="seva-eyebrow">Ceremony details</p><h2>What is included</h2><ul>${listPoints(puja.points)}</ul><div class="cms-package"><span>Package type</span><strong>${esc(puja.package_type)}</strong></div><div class="cms-package"><span>Duration</span><strong>${esc(puja.duration)}</strong></div></aside></section>`;
-    } catch { main.innerHTML = '<section class="cms-not-found"><h1>Puja not found</h1><p>This ceremony may have been removed.</p><a href="/#poojas">Browse all pujas</a></section>'; }
+    } catch {
+      document.title = 'Pooja not found | Divine Homam';
+      setMeta('meta[name="robots"]', 'name', 'robots', 'noindex, follow');
+      main.innerHTML = '<section class="cms-not-found"><h1>Pooja not found</h1><p>This ceremony may have been removed.</p><a href="/#poojas">Browse all pujas</a></section>';
+    }
   })();
 }
 if (document.body.dataset.page === 'admin') {
