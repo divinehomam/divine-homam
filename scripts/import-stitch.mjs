@@ -8,7 +8,7 @@ const originalStyle = html.match(/<style>([\s\S]*?)<\/style>/)[1];
 await writeFile('src/stitch.css', originalStyle);
 html = html.replace(/<script[\s\S]*?<\/script>/g, '').replace(/<style>[\s\S]*?<\/style>/g, '');
 html = html.replace('lang="ta-IN"', 'lang="en-IN"');
-html = html.replace('</head>', '<meta name="description" content="Book traditional Tamil Nadu homams and poojas with Divine Homam. Explore ceremonies and request your preferred muhurtham and Vedic priest.">\n<link rel="stylesheet" href="/styles.css?v=6">\n<script src="/app.js" defer></script>\n</head>');
+html = html.replace('</head>', '<meta name="description" content="Book traditional Tamil Nadu homams and poojas with Divine Homam. Explore ceremonies and request your preferred muhurtham and Vedic priest.">\n<link rel="stylesheet" href="/styles.css?v=11">\n<script src="/app.js" defer></script>\n</head>');
 html = html.replace('<body ', '<body id="top" ');
 html = html.replace('<!-- Auspicious Top', '<a class="skip-link" href="#main-content">Skip to content</a>\n<!-- Auspicious Top');
 html = html.replace('<main>', '<main id="main-content" tabindex="-1">');

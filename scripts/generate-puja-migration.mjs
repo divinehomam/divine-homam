@@ -1,0 +1,30 @@
+import { readFile, writeFile, mkdir } from 'node:fs/promises';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const source = JSON.parse(await readFile(path.join(root, 'src', 'sevas.json'), 'utf8'));
+const html = await readFile(path.join(root, 'public', 'index.html'), 'utf8');
+const cards = [...html.matchAll(/<div class="pooja-card[\s\S]*?(?=<div class="pooja-card|<\/div>\s*<\/div>\s*<\/section>)/g)].map(match => match[0]);
+const decode = value => value.replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+const text = value => decode(value.replace(/<[^>]*>/g, '').trim());
+const sql = value => `'${String(value ?? '').replaceAll("'", "''")}'`;
+const rows = source.map((item, index) => {
+  const card = cards[index] || '';
+  const tamil = text(card.match(/font-family: &quot;Noto Serif Tamil&quot;[^>]*>([\s\S]*?)<\/p>/)?.[1] || item.title);
+  const badgeMarkup = card.match(/tracking-wider uppercase[^>]*>([\s\S]*?)<\/span><span class="inline-flex items-center gap-1 text-body-sm/)?.[1] || '';
+  const badge = text(badgeMarkup.replace(/<span[^>]*>[\s\S]*?<\/span>/g, '')) || 'Vedic Seva';
+  const duration = text(card.match(/schedule<\/span>([^<]+)<\/span><\/div><h3/)?.[1] || item.duration);
+  const packageType = text(card.match(/Dakshina Guidance<\/span><span[^>]*>([^<]*)<\/span>/)?.[1] || item.dakshina);
+  const description = text(card.match(/text-body-md text-on-surface-variant mb-4 leading-relaxed">([\s\S]*?)<\/p>/)?.[1] || item.summary);
+  const cardPoints = [...card.matchAll(/check_circle<\/span><span[^>]*>([^<]*)<\/span>/g)].map(match => text(match[1]));
+  const points = cardPoints.length === 3 ? cardPoints : item.inclusions.slice(0, 3);
+  while (points.length < 3) points.push(`Traditional ${item.title} ritual`);
+  return `  (${[sql(item.slug), sql(item.title), sql(tamil), sql(badge), sql(description), `'${JSON.stringify(points).replaceAll("'", "''")}'::jsonb`, sql(packageType), sql(duration), `'[]'::jsonb`, sql(item.image || ''), sql(item.imageAlt || item.title)].join(', ')})`;
+}).join(',\n');
+const migration = `create table if not exists public.pujas (\n  id uuid primary key default gen_random_uuid(),\n  slug text not null unique,\n  title text not null,\n  tamil_subtitle text not null,\n  badge_text text not null,\n  short_description text not null,\n  points jsonb not null check (jsonb_typeof(points) = 'array' and jsonb_array_length(points) = 3),\n  package_type text not null,\n  duration text not null,\n  image_urls jsonb not null default '[]'::jsonb check (jsonb_typeof(image_urls) = 'array' and jsonb_array_length(image_urls) <= 5),\n  image_url text not null default '',\n  image_alt text not null default '',\n  active boolean not null default true,\n  created_at timestamptz not null default now(),\n  updated_at timestamptz not null default now()\n);\n\nalter table public.pujas enable row level security;\n-- The site accesses this table through a server-side service role. No anon policies are created.\n\ninsert into public.pujas (slug, title, tamil_subtitle, badge_text, short_description, points, package_type, duration, image_urls, image_url, image_alt) values\n${rows.replaceAll(')', ", '[]'::jsonb)")}\non conflict (slug) do nothing;\n`;
+const out = path.join(root, 'supabase', 'migrations', '20261002000000_pujas_cms.sql');
+await mkdir(path.dirname(out), { recursive: true });
+const cleanMigration = migration.replaceAll(", '[]'::jsonb)", ')');
+await writeFile(out, cleanMigration, 'utf8');
+console.log(`Wrote seed migration with ${source.length} existing pujas to ${path.relative(root, out)}`);

@@ -15,7 +15,26 @@ npm run dev
 
 Open http://127.0.0.1:3000. `npm run build` compiles Tailwind locally; `npm start` serves the built site. No runtime framework or animation dependency is required.
 
-Seva page content is maintained in `src/sevas.json`. `npm run build` generates one page per seva under `public/sevas/` and adds the matching “View details” links to the home page. Each entry supplies `image`/`imageAlt` for the lead gallery photo plus `description` and `benefits` paragraphs when present; the remaining three labeled photo slots stay open for more ceremony images.
+`src/sevas.json` remains the source for the legacy static detail-page generator. The live home page catalog and CMS detail pages use Supabase and are managed at `/admin.html`.
+
+## Puja CMS
+
+The public catalog, `/pooja.html?slug=...` detail pages, and `/admin.html` management screen use Supabase. Apply the migrations in `supabase/migrations/` in filename order. They create and seed the table with all eleven current pujas, then add the optional image gallery (up to five Cloudinary images per puja). Row level security is enabled with no public policies; the site accesses Supabase only through server-side endpoints using the service-role key.
+
+Set these server environment variables for local development and in Vercel Project Settings (Production and Preview):
+
+```env
+SUPABASE_URL=https://YOUR_PROJECT.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=YOUR_SERVER_ONLY_SERVICE_ROLE_KEY
+ADMIN_USERNAME=your-admin-name
+ADMIN_PASSWORD=use-a-long-unique-password
+ADMIN_SESSION_SECRET=use-a-different-random-secret-at-least-32-characters
+CLOUDINARY_CLOUD_NAME=your-cloud-name
+CLOUDINARY_API_KEY=your-cloudinary-api-key
+CLOUDINARY_API_SECRET=your-server-only-cloudinary-api-secret
+```
+
+For local work, put them in the ignored `.env` file. Never use a `NEXT_PUBLIC_` prefix for the service-role key or Cloudinary API secret. Visit `/admin.html` to sign in and create, edit, or delete catalog entries. Each entry requires its title, Tamil subtitle, badge, short description, three points, package type, and duration. Upload zero to five images through the Cloudinary upload control; the URLs are saved in Supabase, and the detail page displays the gallery. Admin sessions are HttpOnly, SameSite cookies and expire after eight hours.
 
 ## Booking requests
 

@@ -3,12 +3,24 @@ import { readFile, mkdir, writeFile, stat } from 'node:fs/promises';
 import { createReadStream } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import cmsShared from './api/_cms.cjs';
 
 const root = path.dirname(fileURLToPath(import.meta.url));
+try {
+  const envText = await readFile(path.join(root, '.env'), 'utf8');
+  for (const line of envText.split(/\r?\n/)) {
+    const match = line.match(/^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)\s*$/);
+    if (match && process.env[match[1]] === undefined) process.env[match[1]] = match[2].replace(/^(['"])(.*)\1$/, '$2');
+  }
+} catch (error) { if (error.code !== 'ENOENT') throw error; }
 const publicRoot = path.join(root, 'public');
 const dataRoot = path.resolve(process.env.BOOKINGS_DIR || path.join(root, 'data', 'bookings'));
 const port = Number(process.env.PORT || 3000);
 const host = process.env.HOST || '127.0.0.1';
+const cmsPublic = (await import('./api/pujas.js')).default;
+const cmsLogin = (await import('./api/admin/login.js')).default;
+const cmsAdmin = (await import('./api/admin/pujas.js')).default;
+const cloudinarySignature = (await import('./api/admin/cloudinary-signature.js')).default;
 const types = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'application/javascript; charset=utf-8', '.svg': 'image/svg+xml', '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.webp': 'image/webp', '.mp4': 'video/mp4', '.woff2': 'font/woff2', '.ttf': 'font/ttf', '.ico': 'image/x-icon' };
 const page = await readFile(path.join(publicRoot, 'index.html'), 'utf8');
 const allowedOptions = {};
@@ -39,6 +51,10 @@ const server = http.createServer(async (request, response) => {
   response.setHeader('X-Frame-Options', 'SAMEORIGIN');
   try {
     const url = new URL(request.url, `http://${request.headers.host}`);
+    if (url.pathname === '/api/pujas') return await cmsPublic(request, response);
+    if (url.pathname === '/api/admin/login') return await cmsLogin(request, response);
+    if (url.pathname === '/api/admin/pujas') return await cmsAdmin(request, response);
+    if (url.pathname === '/api/admin/cloudinary-signature') return await cloudinarySignature(request, response);
     if (url.pathname === '/api/bookings' && request.method === 'POST') {
       if (request.headers.origin && new URL(request.headers.origin).host !== request.headers.host) return json(response, 403, { error: 'Please submit from this website.' });
       if (!request.headers['content-type']?.startsWith('application/json')) return json(response, 415, { error: 'Please submit a valid booking form.' });
@@ -51,7 +67,9 @@ const server = http.createServer(async (request, response) => {
       const localDate = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
       const parsedDate = new Date(`${details.ceremonyDate}T00:00:00Z`);
       const validDate = /^\d{4}-\d{2}-\d{2}$/.test(details.ceremonyDate) && !Number.isNaN(parsedDate.getTime()) && parsedDate.toISOString().slice(0, 10) === details.ceremonyDate && details.ceremonyDate >= localDate;
-      if (details.fullName.length < 2 || details.fullName.length > 100 || !/^[6-9]\d{9}$/.test(details.phone) || !validDate || details.notes.length > 2000 || Object.entries(allowedOptions).some(([field, options]) => !options.includes(details[field]))) {
+      const currentPujas = await cmsShared.list().catch(() => null);
+      const allowedPoojas = currentPujas ? currentPujas.map(puja => puja.title) : allowedOptions.poojaSelect;
+      if (details.fullName.length < 2 || details.fullName.length > 100 || !/^[6-9]\d{9}$/.test(details.phone) || !validDate || details.notes.length > 2000 || !allowedPoojas.includes(details.poojaSelect) || Object.entries(allowedOptions).filter(([field]) => field !== 'poojaSelect').some(([field, options]) => !options.includes(details[field]))) {
         return json(response, 422, { error: 'Please check your name, mobile number, ceremony, and future date, then try again.' });
       }
       const id = request.headers['idempotency-key'];
@@ -64,7 +82,8 @@ const server = http.createServer(async (request, response) => {
     if (!['GET', 'HEAD'].includes(request.method)) return json(response, 405, { error: 'Method not allowed.' });
     if (url.pathname.startsWith('/api/')) return json(response, 404, { error: 'Not found.' });
     if (url.pathname === '/favicon.ico') { response.writeHead(204); response.end(); return; }
-    const file = path.resolve(publicRoot, '.' + decodeURIComponent(url.pathname === '/' ? '/index.html' : url.pathname));
+    const staticPath = url.pathname === '/admin' || url.pathname === '/admin/' ? '/admin.html' : (url.pathname === '/' ? '/index.html' : url.pathname);
+    const file = path.resolve(publicRoot, '.' + decodeURIComponent(staticPath));
     if (!file.startsWith(publicRoot + path.sep)) return json(response, 403, { error: 'Forbidden.' });
     let info; try { info = await stat(file); if (!info.isFile()) throw new Error(); } catch { return json(response, 404, { error: 'Not found.' }); }
     const headers = { 'Content-Type': types[path.extname(file)] || 'application/octet-stream', 'Content-Length': info.size, 'Cache-Control': file.endsWith('.html') ? 'no-cache' : 'public, max-age=3600', 'Accept-Ranges': 'bytes' };

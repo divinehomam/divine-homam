@@ -1,4 +1,5 @@
 const { put } = require('@vercel/blob');
+const { list } = require('./_cms.cjs');
 
 const allowedOptions = {
   poojaSelect: [
@@ -53,6 +54,8 @@ module.exports = async function bookings(req, res) {
 
   const fields = ['fullName', 'phone', 'poojaSelect', 'muhurthamTime', 'ceremonyDate', 'citySelect', 'notes'];
   const details = Object.fromEntries(fields.map((field) => [field, typeof input[field] === 'string' ? input[field].trim() : '']));
+  const currentPujas = await list().catch(() => null);
+  const allowedPoojas = currentPujas ? currentPujas.map(puja => puja.title) : allowedOptions.poojaSelect;
   const localDate = new Intl.DateTimeFormat('en-CA', {
     timeZone: 'Asia/Kolkata', year: 'numeric', month: '2-digit', day: '2-digit',
   }).format(new Date());
@@ -66,7 +69,8 @@ module.exports = async function bookings(req, res) {
     || !/^[6-9]\d{9}$/.test(details.phone)
     || !validDate
     || details.notes.length > 2000
-    || Object.entries(allowedOptions).some(([field, options]) => !options.includes(details[field]))) {
+    || !allowedPoojas.includes(details.poojaSelect)
+    || Object.entries(allowedOptions).filter(([field]) => field !== 'poojaSelect').some(([field, options]) => !options.includes(details[field]))) {
     return respond(res, 422, { error: 'Please check your name, mobile number, ceremony, and future date, then try again.' });
   }
 
