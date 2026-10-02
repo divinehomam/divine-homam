@@ -14,8 +14,10 @@ begin
   end if;
 end $$;
 
--- Preserve an earlier Cloudinary upload as the first gallery image.
+-- Preserve existing catalog images as the first gallery image. Older pujas
+-- use local /assets paths, while newer records may use Cloudinary URLs.
 update public.pujas
 set image_urls = jsonb_build_array(image_url)
-where image_url ~ '^https://res\.cloudinary\.com/[^/]+/image/upload/'
+where (image_url ~ '^https://res\.cloudinary\.com/[^/]+/image/upload/'
+       or image_url ~ '^/assets/[A-Za-z0-9._-]+$')
   and image_urls = '[]'::jsonb;

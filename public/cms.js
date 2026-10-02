@@ -1,10 +1,14 @@
 'use strict';
 const esc = value => String(value || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-const isCloudinaryImage = value => { try { const image = new URL(value); return image.protocol === 'https:' && image.hostname === 'res.cloudinary.com' && /^\/[^/]+\/image\/upload\//.test(image.pathname); } catch { return false; } };
+const isPujaImage = value => {
+  if (typeof value !== 'string') return false;
+  if (/^\/assets\/[a-zA-Z0-9._-]+$/.test(value)) return true;
+  try { const image = new URL(value); return image.protocol === 'https:' && image.hostname === 'res.cloudinary.com' && /^\/[^/]+\/image\/upload\//.test(image.pathname); } catch { return false; }
+};
 const listPoints = points => (Array.isArray(points) ? points : []).map(point => `<li><span class="material-symbols-outlined" aria-hidden="true">check_circle</span><span>${esc(point)}</span></li>`).join('');
 function card(puja) {
-  const images = Array.isArray(puja.image_urls) ? puja.image_urls.filter(isCloudinaryImage) : [];
-  const primaryImage = images[0] || (isCloudinaryImage(puja.image_url) ? puja.image_url : '');
+  const images = Array.isArray(puja.image_urls) ? puja.image_urls.filter(isPujaImage) : [];
+  const primaryImage = images[0] || (isPujaImage(puja.image_url) ? puja.image_url : '');
   const image = primaryImage ? `<img src="${esc(primaryImage)}" alt="${esc(puja.image_alt || puja.title)}" loading="lazy" decoding="async">` : '<div class="cms-image-placeholder"><span aria-hidden="true">✦</span><small>No images added</small></div>';
   const types = `${/homam/i.test(puja.title) ? 'homam' : ''} ${/family|griha|vratham|pooja|60th|70th/i.test(puja.title) ? 'family' : ''} ${/shanti|dosha|mandala/i.test(puja.title) ? 'shanti' : ''}`.trim();
   return `<article class="pooja-card cms-card" data-type="${types}"><div class="cms-card-image">${image}<span class="cms-badge">${esc(puja.badge_text)}</span></div><div class="cms-card-body"><div class="cms-facts"><span>${esc(puja.package_type)}</span><span>◷ ${esc(puja.duration)}</span></div><h3 class="cms-title">${esc(puja.title)}</h3><p class="cms-tamil" lang="ta">${esc(puja.tamil_subtitle)}</p><p class="cms-description">${esc(puja.short_description)}</p><ul class="cms-points">${listPoints(puja.points)}</ul><div class="cms-package"><span>Package type</span><strong>${esc(puja.package_type)}</strong></div><a class="service-details-link" href="/pooja.html?slug=${encodeURIComponent(puja.slug)}">View details</a><button class="cms-book" type="button" data-book="${esc(puja.title)}">Book This Seva</button></div></article>`;
@@ -48,8 +52,8 @@ if (document.body.dataset.page === 'pooja') {
       const puja = (await response.json()).find(item => item.slug === slug);
       if (!puja) throw new Error();
       document.title = `${puja.title} | Divine Homam`;
-      const images = Array.isArray(puja.image_urls) ? puja.image_urls.filter(isCloudinaryImage) : [];
-      if (!images.length && isCloudinaryImage(puja.image_url)) images.push(puja.image_url);
+      const images = Array.isArray(puja.image_urls) ? puja.image_urls.filter(isPujaImage) : [];
+      if (!images.length && isPujaImage(puja.image_url)) images.push(puja.image_url);
       const gallery = images.length
         ? images.map((url, index) => `<figure class="cms-detail-photo${index === 0 ? ' cms-detail-feature' : ''}"><img src="${esc(url)}" alt="${esc(puja.image_alt || `${puja.title} photo ${index + 1}`)}" loading="${index === 0 ? 'eager' : 'lazy'}" decoding="async"></figure>`).join('')
         : '<div class="cms-image-placeholder cms-detail-image"><span aria-hidden="true">✦</span><small>No images added</small></div>';
@@ -65,8 +69,8 @@ if (document.body.dataset.page === 'admin') {
   function renderLogin() { root.innerHTML = `<section class="admin-panel admin-login"><p class="admin-kicker">Divine Homam · CMS</p><h1>Admin sign in</h1><p>Sign in to manage puja services.</p><form id="loginForm"><label>Username<input name="username" autocomplete="username" required></label><label>Password<input name="password" type="password" autocomplete="current-password" required></label><button class="admin-button">Sign in</button></form><a href="/">← Back to website</a></section>`; root.querySelector('#loginForm').addEventListener('submit', async e => { e.preventDefault(); try { await request('/api/admin/login', { method: 'POST', body: JSON.stringify(Object.fromEntries(new FormData(e.currentTarget))) }); await renderDashboard(); } catch (error) { status(error.message, true); } }); }
   function formMarkup(puja = {}) {
     const points = puja.points || ['', '', ''];
-    const images = Array.isArray(puja.image_urls) ? puja.image_urls.filter(isCloudinaryImage) : [];
-    if (!images.length && isCloudinaryImage(puja.image_url)) images.push(puja.image_url);
+    const images = Array.isArray(puja.image_urls) ? puja.image_urls.filter(isPujaImage) : [];
+    if (!images.length && isPujaImage(puja.image_url)) images.push(puja.image_url);
     const imageHint = `${images.length} of 5 images in this gallery. Add or remove optional images.`;
     const previews = images.map((url, index) => `<figure><img src="${escape(url)}" alt="Puja image ${index + 1}"><button type="button" data-remove-image="${index}" aria-label="Remove image ${index + 1}">Remove</button></figure>`).join('');
     return `<form id="pujaForm" class="admin-form">
@@ -121,7 +125,7 @@ if (document.body.dataset.page === 'admin') {
             const signed = await request('/api/admin/cloudinary-signature', { method: 'POST' });
             const upload = new FormData(); upload.append('file', files[index]); upload.append('api_key', signed.api_key); upload.append('timestamp', String(signed.timestamp)); upload.append('signature', signed.signature); upload.append('folder', signed.folder); upload.append('allowed_formats', signed.allowed_formats);
             const uploaded = await fetch(`https://api.cloudinary.com/v1_1/${encodeURIComponent(signed.cloud_name)}/image/upload`, { method: 'POST', body: upload });
-            const result = await uploaded.json(); if (!uploaded.ok || !result.secure_url || !isCloudinaryImage(result.secure_url)) throw new Error(result.error?.message || 'Cloudinary upload failed.');
+            const result = await uploaded.json(); if (!uploaded.ok || !result.secure_url || !isPujaImage(result.secure_url)) throw new Error(result.error?.message || 'Cloudinary upload failed.');
             urls.push(result.secure_url); showImages(urls);
           }
           imageInput.value = ''; imageStatus.textContent = `${urls.length} of 5 images uploaded and ready to save.`;

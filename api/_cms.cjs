@@ -60,7 +60,7 @@ function validate(input) {
   if (!Array.isArray(out.points) || out.points.length !== 3 || out.points.some(point => typeof point !== 'string' || !point.trim() || point.trim().length > 180)) throw Object.assign(new Error('Enter exactly three valid pooja points.'), { status: 422 });
   out.points = out.points.map(point => point.trim());
   const urls = Array.isArray(input.image_urls) ? input.image_urls : (typeof input.image_url === 'string' && input.image_url ? [input.image_url] : []);
-  if (urls.length > 5 || urls.some(value => typeof value !== 'string' || !isCloudinaryImage(value))) throw Object.assign(new Error('Use the upload control to add up to five Cloudinary images.'), { status: 422 });
+  if (urls.length > 5 || urls.some(value => !isPujaImage(value))) throw Object.assign(new Error('Use the upload control to add up to five valid puja images.'), { status: 422 });
   out.image_urls = urls;
   out.image_url = urls[0] || '';
   out.image_alt = typeof out.image_alt === 'string' ? out.image_alt.trim() : out.title;
@@ -70,6 +70,9 @@ function validate(input) {
 function isCloudinaryImage(value) {
   try { const image = new URL(value); return image.protocol === 'https:' && image.hostname === 'res.cloudinary.com' && /^\/[^/]+\/image\/upload\//.test(image.pathname); }
   catch { return false; }
+}
+function isPujaImage(value) {
+  return typeof value === 'string' && (/^\/assets\/[a-zA-Z0-9._-]+$/.test(value) || isCloudinaryImage(value));
 }
 function slugify(value) { return value.normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 70); }
 async function list() { return db(`${TABLE}?select=${fields.join(',')}&active=eq.true&order=created_at.asc`, { method: 'GET' }); }
