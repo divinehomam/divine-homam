@@ -1024,6 +1024,21 @@ body.seva-page {
   min-height: 310px
 }
 
+.seva-gallery-photo {
+  display: block;
+  width: 100%;
+  min-height: 142px;
+  height: 100%;
+  object-fit: cover;
+  border: 1px solid rgba(180, 83, 9, .28);
+  border-radius: 12px;
+  background: #f7ead0
+}
+
+.seva-gallery-feature .seva-gallery-photo {
+  min-height: 310px
+}
+
 .seva-photo-placeholder .material-symbols-outlined {
   font-size: 28px
 }
@@ -1110,6 +1125,59 @@ body.seva-page {
 }
 
 .seva-inclusions-card li .material-symbols-outlined {
+  margin-top: 2px;
+  color: #9a7214;
+  font-size: 17px
+}
+
+.seva-benefits {
+  margin-top: clamp(24px, 4vw, 40px);
+  padding: 52px clamp(24px, 6vw, 68px);
+  border: 1px solid rgba(202, 138, 4, .26);
+  border-radius: 18px;
+  background: #fff9ed
+}
+
+.seva-benefits-heading {
+  max-width: 680px;
+  margin: 0 auto 30px;
+  text-align: center
+}
+
+.seva-benefits h2 {
+  margin-bottom: 14px;
+  color: #760009;
+  font-size: clamp(24px, 2.8vw, 32px);
+  line-height: 1.2
+}
+
+.seva-benefits-heading > p:not(.seva-eyebrow) {
+  color: #59413e;
+  font-size: 15px;
+  line-height: 1.8
+}
+
+.seva-benefits-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 14px
+}
+
+.seva-benefits-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 17px 18px;
+  border: 1px solid rgba(118, 0, 9, .12);
+  border-radius: 14px;
+  background: #fffdf7;
+  box-shadow: 0 8px 22px rgba(81, 34, 14, .05);
+  color: #59413e;
+  font-size: 14px;
+  line-height: 1.6
+}
+
+.seva-benefits-list li .material-symbols-outlined {
   margin-top: 2px;
   color: #9a7214;
   font-size: 17px
@@ -1302,6 +1370,14 @@ body.seva-page {
     min-height: 220px
   }
 
+  .seva-gallery-feature .seva-gallery-photo {
+    min-height: 220px
+  }
+
+  .seva-gallery-photo {
+    min-height: 105px
+  }
+
   .seva-photo-placeholder {
     min-height: 105px;
     padding-inline: 5px
@@ -1319,6 +1395,16 @@ body.seva-page {
 
   .seva-inclusions-card {
     padding: 20px
+  }
+
+  .seva-benefits {
+    padding: 30px 18px;
+    border-radius: 14px
+  }
+
+  .seva-benefits-list {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px
   }
 
   .seva-planning {

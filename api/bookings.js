@@ -8,8 +8,12 @@ const allowedOptions = {
     'Sri Ayushya Homam',
     'Sri Satyanarayana Swamy Vratham',
     'Sashtiapthapoorthi (60th) Seva',
+    'Kala Sarpa Dosha Shanti Homam',
+    'Dhanvantari Homam',
+    'Narayana Pooja',
+    'Temple Balalayam and Kumbhabhishekam',
+    '48-Day Temple Mandala Abhishekam',
     'Sudarshana Homam',
-    'Dhanvantri Homam',
     'Other Custom Pooja',
   ],
   muhurthamTime: [

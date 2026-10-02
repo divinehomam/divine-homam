@@ -15,7 +15,7 @@ npm run dev
 
 Open http://127.0.0.1:3000. `npm run build` compiles Tailwind locally; `npm start` serves the built site. No runtime framework or animation dependency is required.
 
-Seva page content is maintained in `src/sevas.json`. `npm run build` generates one page per seva under `public/sevas/` and adds the matching “View details” links to the home page. Each page reserves four labeled photo slots for ceremony images.
+Seva page content is maintained in `src/sevas.json`. `npm run build` generates one page per seva under `public/sevas/` and adds the matching “View details” links to the home page. Each entry supplies `image`/`imageAlt` for the lead gallery photo plus `description` and `benefits` paragraphs when present; the remaining three labeled photo slots stay open for more ceremony images.
 
 ## Booking requests
 
@@ -27,7 +27,7 @@ On Vercel, `/api/bookings` is deployed as a Node.js Function and booking JSON is
 
 Import `divinehomam/divine-homam` in Vercel. The included `vercel.json` selects the Other framework preset, runs `npm run build`, and publishes `public/`. The `api/bookings.js` function is deployed with the site. Connect a private Vercel Blob store before accepting bookings; without its `BLOB_READ_WRITE_TOKEN`, submissions return an error. Pushes to the connected Git branch trigger new deployments.
 
-The site does not send emails, process payments, assign priests, or confirm availability. Publish real privacy and booking policies. Source testimonials, certification statements, and ritual safety claims are retained as requested and need the owner's review. The source's first-card photo count is retained; only one photo per ceremony was supplied.
+The site does not send emails, process payments, assign priests, or confirm availability. Publish real privacy and booking policies. Source testimonials, certification statements, and ritual safety claims are retained as requested and need the owner's review. The source's first-card photo count is retained; only one photo per ceremony was supplied. The ceremony dropdown in `public/index.html` is the source of truth for the local server's allowlist, while `api/bookings.js` keeps a matching hardcoded copy that must be updated whenever a seva is added or renamed.
 
 ## Motion
 

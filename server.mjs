@@ -9,7 +9,7 @@ const publicRoot = path.join(root, 'public');
 const dataRoot = path.resolve(process.env.BOOKINGS_DIR || path.join(root, 'data', 'bookings'));
 const port = Number(process.env.PORT || 3000);
 const host = process.env.HOST || '127.0.0.1';
-const types = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'application/javascript; charset=utf-8', '.svg': 'image/svg+xml', '.png': 'image/png', '.mp4': 'video/mp4', '.woff2': 'font/woff2', '.ttf': 'font/ttf', '.ico': 'image/x-icon' };
+const types = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'application/javascript; charset=utf-8', '.svg': 'image/svg+xml', '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.webp': 'image/webp', '.mp4': 'video/mp4', '.woff2': 'font/woff2', '.ttf': 'font/ttf', '.ico': 'image/x-icon' };
 const page = await readFile(path.join(publicRoot, 'index.html'), 'utf8');
 const allowedOptions = {};
 for (const name of ['poojaSelect', 'muhurthamTime', 'citySelect']) {

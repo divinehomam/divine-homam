@@ -9,7 +9,9 @@
       "2 Veda Pandits (Rig / Yajur Veda)",
       "108 Modakas and dry coconut offering",
       "Customized Grihastha Sankalpam"
-    ]
+    ],
+    "image": "/assets/2e71a214000f40a2ac8d5eb090f599c0.png",
+    "imageAlt": "Sri Maha Ganapathi Sacred Homam Setup"
   },
   {
     "slug": "gruhapravesam-vastu-homam",
@@ -21,7 +23,9 @@
       "Lead Vadhyar and 2 assisting priests",
       "Milk boiling (Paal Kaichuthal) guidance",
       "Punyahavachanam and Kalasa Sthapana"
-    ]
+    ],
+    "image": "/assets/abb969c245af41c28442e7e7ad68f4d0.png",
+    "imageAlt": "Gruhapravesam and Vastu Homam Tamil Nadu ceremony"
   },
   {
     "slug": "navagraha-shanti-homam",
@@ -33,7 +37,9 @@
       "9 Dhanyams, 9 Vastrams, and 9 Samiths",
       "2 Certified Vedic Priests",
       "Complete Navagraha Japa mantras"
-    ]
+    ],
+    "image": "/assets/b9fe05929e21420395610ef99447cd86.png",
+    "imageAlt": "Navagraha Shanti Homam Navadhanya setup"
   },
   {
     "slug": "sri-ayushya-homam",
@@ -45,7 +51,9 @@
       "Ayur Devata and Markandeya invocation",
       "Brahma-Varuna Kalasa Pooja",
       "Charu preparation support"
-    ]
+    ],
+    "image": "/assets/76c961b4589e4ebb81b96ede80892185.png",
+    "imageAlt": "Sri Ayushya Homam ritual for child health"
   },
   {
     "slug": "sri-satyanarayana-swamy-vratham",
@@ -57,7 +65,9 @@
       "Sacred recitation of all 5 Adhyayas",
       "Sapadabhakshya (Prasadam) Vidhi",
       "Mangala Harathi with traditional deepam"
-    ]
+    ],
+    "image": "/assets/4af39cb815cb4fc581e10417cf51d804.png",
+    "imageAlt": "Sri Satyanarayana Swamy Vratham mandapam"
   },
   {
     "slug": "sashtiapthapoorthi-bheemaratha-shanthi",
@@ -70,6 +80,127 @@
       "4 to 7 Veda Pandits (team of Acharyas)",
       "60 or 70 Kalasa Sthapana and Snanam",
       "Mangalya Dharanam and Swarna Dana Vidhi"
-    ]
+    ],
+    "image": "/assets/745a80e872eb45798a95ef375444b548.png",
+    "imageAlt": "Sashtiapthapoorthi 60th birthday ritual blessings"
+  },
+  {
+    "slug": "kala-sarpa-dosha-shanti-homam",
+    "title": "Kala Sarpa Dosha Shanti Homam",
+    "duration": "3–4 hours",
+    "dakshina": "Standard or complete samagri",
+    "summary": "A homam dedicated to Kala Sarpa Dosha, traditionally performed to ease fear and confusion, clear obstacles in work and business, and support family harmony.",
+    "description": [
+      "Kala Sarpa Dosha Shanti Homam is a Vedic fire ritual performed to pacify the serpent dosha identified in a horoscope. The ceremony includes Sankalpam, Navagraha shanti, and the recitation of the dosha-nivarana mantras with offerings to the serpent deities."
+    ],
+    "benefits": [
+      "Peace of mind: Traditionally performed to help ease fear, stress, and confusion and encourage a sense of calm.",
+      "Career and financial progress: Prayers are offered to overcome obstacles in work or business and support steady progress and financial stability.",
+      "Family harmony: Seeks blessings for greater understanding and unity among spouses and family members.",
+      "Relief from marriage delays: Traditionally performed to seek blessings for progress toward marriage.",
+      "Spiritual protection: Prayers are offered for protection from negative influences and harmful energies.",
+      "Well-being: Seeks blessings for good health and relief from long-standing health concerns."
+    ],
+    "inclusions": [
+      "Sarpa Dosha Nashak and Navagraha Shanti",
+      "2 Certified Vedic Priests",
+      "Complete Dosha Nivarana mantras and Sankalpam"
+    ],
+    "image": "/assets/kalasarpa.jpeg",
+    "imageAlt": "Kala Sarpa Dosha Shanti Homam serpent dosha ritual"
+  },
+  {
+    "slug": "dhanvantari-homam",
+    "title": "Dhanvantari Homam",
+    "duration": "2–3 hours",
+    "dakshina": "Standard or complete samagri",
+    "summary": "A homam to Lord Dhanvantari, the divine physician, performed to seek relief from illness, support recovery, and pray for good health and a long life.",
+    "description": [
+      "Dhanvantari Homam is a fire ritual dedicated to Lord Dhanvantari, the divine physician who emerged from the churning of the cosmic ocean. The homam includes abhishekam, naivedhyam, and the recitation of the Dhanvantari mantras for healing and longevity."
+    ],
+    "benefits": [
+      "Prayers for recovery: Performed to seek blessings for relief from illness and support during recovery.",
+      "Health and longevity: Prayers are offered for overall well-being, physical and mental strength, and long life.",
+      "Peace of mind: May bring comfort and calm to those worried about health concerns."
+    ],
+    "inclusions": [
+      "Dhanvantari and Ayurveda Devata invocation",
+      "Dhanvantari Kalasa and abhishekam",
+      "2 Certified Vedic Priests and healing Sankalpam"
+    ],
+    "image": "/assets/dhanvanthiri.jpeg",
+    "imageAlt": "Dhanvantari Homam Lord Dhanvantari heerthalaya"
+  },
+  {
+    "slug": "narayana-pooja",
+    "title": "Narayana Pooja",
+    "duration": "2–3 hours",
+    "dakshina": "Standard or complete samagri",
+    "summary": "A devotional worship of Lord Narayana with prayers, offerings, and the recitation of sacred names and mantras, seeking peace, prosperity, and well-being.",
+    "description": [
+      "Narayana Pooja is a devotional worship of Lord Narayana, seeking blessings for peace, prosperity, and well-being. The pooja may include prayers, offerings, and the recitation of sacred names and mantras."
+    ],
+    "benefits": [
+      "Peace and devotion: Encourages a calm mind and a deeper sense of devotion.",
+      "Prosperity and well-being: Seeks blessings for abundance, health, and happiness.",
+      "Family harmony: Prayers are offered for unity and well-being within the family.",
+      "Spiritual growth: Supports reflection, gratitude, and a stronger connection with the divine."
+    ],
+    "inclusions": [
+      "Archana with tulasi, flowers, and naivedhyam",
+      "Narayana nama and mantra recitation",
+      "Family Sankalpam, harathi, and prasadam"
+    ],
+    "image": "/assets/templ1.jpeg",
+    "imageAlt": "Narayana Pooja temple archana and offerings"
+  },
+  {
+    "slug": "temple-balalayam-kumbhabhishekam",
+    "title": "Temple Balalayam and Kumbhabhishekam",
+    "duration": "Full day",
+    "dakshina": "Temple ritual package",
+    "summary": "Temple consecration rituals performed to renew and sanctify a temple, with the divine presence ritually invoked, transferred, and ceremonially reinstalled after renovation.",
+    "description": [
+      "Balalayam and Kumbhabhishekem are important temple consecration rituals traditionally performed to renew and sanctify a temple.",
+      "During Balalayam, the divine presence is ritually invoked and temporarily transferred while restoration or renovation work takes place. Once the work is complete, Kumbhabhishekem is performed, involving sacred water from consecrated pots being ceremonially poured over the temple's vimana and kalashams."
+    ],
+    "benefitsTitle": "Purpose of the Ritual",
+    "benefits": [
+      "To sanctify the temple after renovation or restoration.",
+      "To ceremonially reinstall the divine presence in the temple.",
+      "To pray for the well-being and prosperity of the temple and its devotees.",
+      "To mark the completion of the restoration with traditional rites and community worship."
+    ],
+    "inclusions": [
+      "Silpa Shastra based vastu shanti and Muhurtham guidance",
+      "Kalasha, hetra, and vimana consecration",
+      "Abhishekam, archana, Maha Harathi, and community prasadam"
+    ],
+    "image": "/assets/temple2.jpeg",
+    "imageAlt": "Temple Balalayam and Kumbhabhishekam consecration ritual"
+  },
+  {
+    "slug": "temple-mandala-abhishekam-48-days",
+    "title": "48-Day Temple Mandala Abhishekam",
+    "duration": "48 days",
+    "dakshina": "Temple ritual package",
+    "summary": "A series of sacred bathing rituals performed at a temple over a traditional 48-day mandala period, with offerings and abhishekam made to the deity with prayers.",
+    "description": [
+      "Mandala Abhishekam is a series of sacred bathing rituals performed at a temple over a traditional 48-day mandala period. Offerings and abhishekam are made to the deity with prayers and devotional observances."
+    ],
+    "benefitsTitle": "Purpose of the Ritual",
+    "benefits": [
+      "To offer sustained worship and prayers to the deity.",
+      "To seek blessings for peace, health, and prosperity.",
+      "To encourage devotion and spiritual discipline among participants.",
+      "To bring the temple community together in worship over the mandala period."
+    ],
+    "inclusions": [
+      "48 days of abhishekam and archana tharpanam",
+      "Kalasha abhishekam and traditional naivedhyam",
+      "Mandala pravachanam, kola purasabha, and prasadam"
+    ],
+    "image": "/assets/temple3.jpeg",
+    "imageAlt": "48-Day Temple Mandala Abhishekam bathing ritual"
   }
 ]

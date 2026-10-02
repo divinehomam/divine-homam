@@ -57,7 +57,7 @@ try {
     assert.equal(await page.evaluate(() => [...document.images].every(img => img.complete && img.naturalWidth > 0)), true);
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
     await page.screenshot({ path: path.join(output, `${name}-full.png`), fullPage: true });
-    for (const [category, count] of [['homam', 4], ['family', 5], ['shanti', 2], ['all', 6]]) {
+    for (const [category, count] of [['homam', 6], ['family', 6], ['shanti', 6], ['all', 11]]) {
       await page.locator(`[data-category="${category}"]`).click();
       assert.equal(await page.locator('.pooja-card:visible').count(), count);
     }
@@ -78,7 +78,7 @@ try {
     await page.screenshot({ path: path.join(output, `${name}-faq.png`) });
     const cls = await page.evaluate(() => window.__cls);
     report.viewports.push({ name, width, height, layoutShift: cls });
-    pass(`${name}: no overflow, images, reveals, offscreen pause, all filters, all six booking links, FAQs`);
+    pass(`${name}: no overflow, images, reveals, offscreen pause, all filters, all eleven booking links, FAQs`);
     await context.close();
   }
   const context = await browser.newContext({ viewport: { width: 390, height: 844 }, reducedMotion: 'reduce' });

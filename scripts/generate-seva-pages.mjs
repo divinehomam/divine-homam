@@ -13,6 +13,7 @@ const escapeRegExp = value => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 await mkdir(output, { recursive: true });
 let homePage = await readFile(homePagePath, 'utf8');
+const eol = homePage.includes('\r\n') ? '\r\n' : '\n';
 
 for (const seva of services) {
   const title = escapeHtml(seva.title);
@@ -22,12 +23,11 @@ for (const seva of services) {
   if (!homePage.includes(detailMarker)) {
     const buttonPattern = new RegExp(`<button\\b(?=[^>]*\\bdata-book="${escapeRegExp(escapeHtml(bookingValue))}")[^>]*>[\\s\\S]*?<\\/button>`);
     if (!buttonPattern.test(homePage)) throw new Error(`Could not find the home page booking button for ${seva.title}.`);
-    const detailLink = `<a class="service-details-link" ${detailMarker} href="/sevas/${seva.slug}.html" aria-label="View details for ${title}">View details</a>\n`;
+    const detailLink = `<a class="service-details-link" ${detailMarker} href="/sevas/${seva.slug}.html" aria-label="View details for ${title}">View details</a>${eol}`;
     homePage = homePage.replace(buttonPattern, `${detailLink}$&`);
   }
   const bookingUrl = `/?seva=${encodeURIComponent(bookingValue)}#booking-form`;
-  const slots = [
-    ['01', 'Main ceremony photograph', 'seva-gallery-feature'],
+  const placeholders = [
     ['02', 'Preparation and samagri', ''],
     ['03', 'Priest and ritual details', ''],
     ['04', 'Family ceremony moment', '']
@@ -40,8 +40,38 @@ for (const seva of services) {
           </div>
           <figcaption>${escapeHtml(caption)}</figcaption>
         </figure>`).join('');
+  const feature = seva.image
+    ? `
+        <figure class="seva-gallery-item seva-gallery-feature">
+          <img class="seva-gallery-photo" src="${escapeHtml(seva.image)}" alt="${escapeHtml(seva.imageAlt || title)}" width="1200" height="896" loading="lazy" decoding="async">
+          <figcaption>Main ceremony photograph</figcaption>
+        </figure>`
+    : `
+        <figure class="seva-gallery-item seva-gallery-feature">
+          <div class="seva-photo-placeholder" role="img" aria-label="Photo 01 placeholder: Main ceremony photograph">
+            <span class="seva-photo-number">01</span>
+            <span class="material-symbols-outlined" aria-hidden="true">add_photo_alternate</span>
+            <span class="seva-photo-note">Photo to be added</span>
+          </div>
+          <figcaption>Main ceremony photograph</figcaption>
+        </figure>`;
+  const slots = `${feature}${placeholders}`;
   const inclusions = seva.inclusions.map(item => `
             <li><span class="material-symbols-outlined" aria-hidden="true">check_circle</span><span>${escapeHtml(item)}</span></li>`).join('');
+  const description = (seva.description || []).map(paragraph => `
+        <p>${escapeHtml(paragraph)}</p>`).join('');
+  const benefits = (seva.benefits || []).map(item => `
+          <li><span class="material-symbols-outlined" aria-hidden="true">check_circle</span><span>${escapeHtml(item)}</span></li>`).join('');
+  const benefitsSection = benefits ? `
+    <section class="seva-benefits" aria-labelledby="benefits-title">
+      <div class="seva-benefits-heading">
+        <p class="seva-eyebrow">Traditional Significance</p>
+        <h2 id="benefits-title">${escapeHtml(seva.benefitsTitle || 'Key Benefits')}</h2>
+        <p>Shared by devotees who request this seva, and offered as prayers during the ceremony.</p>
+      </div>
+      <ul class="seva-benefits-list">${benefits}
+      </ul>
+    </section>` : '';
   const page = `<!doctype html>
 <html lang="en-IN">
 <head>
@@ -94,7 +124,7 @@ for (const seva of services) {
       <div class="seva-information-copy">
         <p class="seva-eyebrow">About this Seva</p>
         <h2 id="about-seva">A ceremony planned around your family</h2>
-        <p>${summary}</p>
+        <p>${summary}</p>${description}
         <p>Share your preferred date, location, Muhurtham window, and any family or tradition notes. The coordinator will confirm priest availability, the final timing, and samagri arrangements with you.</p>
       </div>
       <aside class="seva-inclusions-card" aria-labelledby="included-title">
@@ -103,7 +133,7 @@ for (const seva of services) {
         <ul>${inclusions}
         </ul>
       </aside>
-    </section>
+    </section>${benefitsSection}
     <section class="seva-planning" aria-labelledby="planning-title">
       <div class="seva-planning-heading">
         <p class="seva-eyebrow">From request to confirmation</p>

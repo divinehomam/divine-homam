@@ -13,7 +13,7 @@ Tested in headless Microsoft Edge 154 on the local Node server. The working prev
 | Small mobile | 360 × 800 | Passed |
 
 - All local images loaded; no horizontal overflow or browser runtime errors were observed.
-- All four category filters and all six ceremony-to-form links worked.
+- All four category filters and all eleven ceremony-to-form links worked.
 - Section reveals completed during scrolling. Muted hero video autoplayed inline and looped on desktop and mobile without player controls. It paused offscreen and in background tabs. Reduced-motion users saw the static poster without downloading the video.
 - Menu opening/closing, anchor navigation, focus containment, Escape, and focus restoration passed on mobile.
 - FAQ transitions opened one answer at a time and exposed the correct expanded state.
