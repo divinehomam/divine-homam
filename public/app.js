@@ -189,7 +189,7 @@ form.addEventListener('submit', async event => {
 });
 
 // Content is visible by default. Reveals are enabled only after JS initializes.
-const revealTargets = $$('main section:not(#hero) h2, .pooja-card, #why-divinehomam .brass-border, #acharyas .brass-border, #how-it-works .brass-border');
+const revealTargets = $$('main section:not(#hero) h2, .pooja-card, #acharyas .brass-border, #how-it-works .brass-border');
 const revealObserver = new IntersectionObserver(entries => {
   entries.forEach(entry => {
     if (!entry.isIntersecting) return;
