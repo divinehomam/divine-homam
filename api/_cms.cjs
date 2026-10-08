@@ -26,14 +26,15 @@ function safeEqual(a, b) {
   const aa = Buffer.from(String(a)); const bb = Buffer.from(String(b));
   return aa.length === bb.length && crypto.timingSafeEqual(aa, bb);
 }
-function cloudinarySignature(timestamp) {
+function cloudinarySignature(timestamp, folder = 'pujas') {
   const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
   const apiKey = process.env.CLOUDINARY_API_KEY;
   const apiSecret = process.env.CLOUDINARY_API_SECRET;
   if (!cloudName || !apiKey || !apiSecret) throw Object.assign(new Error('Image uploads are not configured. Set the Cloudinary keys in .env.'), { status: 503 });
-  const params = `allowed_formats=avif,jpg,png,webp&folder=pujas&timestamp=${timestamp}`;
+  if (!['pujas', 'priests'].includes(folder)) throw Object.assign(new Error('Invalid upload folder.'), { status: 400 });
+  const params = `allowed_formats=avif,jpg,png,webp&folder=${folder}&timestamp=${timestamp}`;
   const signature = crypto.createHash('sha1').update(`${params}${apiSecret}`).digest('hex');
-  return { cloud_name: cloudName, api_key: apiKey, timestamp, signature, folder: 'pujas', allowed_formats: 'avif,jpg,png,webp' };
+  return { cloud_name: cloudName, api_key: apiKey, timestamp, signature, folder, allowed_formats: 'avif,jpg,png,webp' };
 }
 function secret() { return process.env.ADMIN_SESSION_SECRET || process.env.ADMIN_PASSWORD || ''; }
 function sign(value) { return crypto.createHmac('sha256', secret()).update(value).digest('base64url'); }
@@ -76,4 +77,4 @@ function isPujaImage(value) {
 }
 function slugify(value) { return value.normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 70); }
 async function list() { return db(`${TABLE}?select=${fields.join(',')}&active=eq.true&order=created_at.asc`, { method: 'GET' }); }
-module.exports = { db, fields, list, send, readBody, validate, slugify, authenticated, token, safeEqual, cloudinarySignature };
+module.exports = { db, fields, list, send, readBody, validate, slugify, authenticated, token, safeEqual, cloudinarySignature, isCloudinaryImage };

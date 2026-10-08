@@ -48,6 +48,22 @@ async function loadPujas() {
     return pujas;
   } catch { return []; }
 }
+async function loadPriests() {
+  const grid = document.querySelector('#priestGrid');
+  if (!grid) return;
+  try {
+    const response = await fetch('/api/priests', { headers: { Accept: 'application/json' } });
+    if (!response.ok) throw new Error();
+    const priests = await response.json();
+    if (!Array.isArray(priests)) throw new Error();
+    grid.innerHTML = priests.length ? priests.map(priest => {
+      const photo = isPujaImage(priest.photo_url) ? priest.photo_url : '';
+      if (!photo) return '';
+      const years = Number(priest.years_experience);
+      return `<article class="priest-card"><div class="priest-card-photo"><img class="priest-card-backdrop" src="${esc(photo)}" alt="" aria-hidden="true" loading="lazy" decoding="async"><img class="priest-card-portrait" src="${esc(photo)}" alt="${esc(priest.name)}" loading="lazy" decoding="async"></div><div class="priest-card-body"><div class="priest-card-top"><h3>${esc(priest.name)}</h3><span class="priest-years">${Number.isInteger(years) ? years : 0} ${years === 1 ? 'year' : 'years'} experience</span></div><p>${esc(priest.description)}</p></div></article>`;
+    }).join('') : '<p class="priest-message">Meet our priests here soon.</p>';
+  } catch { grid.innerHTML = '<p class="priest-message">Our priest profiles are temporarily unavailable.</p>'; }
+}
 document.addEventListener('click', event => {
   const book = event.target.closest('[data-book]');
   if (book && document.querySelector('#poojaBookingForm')) {
@@ -118,7 +134,7 @@ if (document.body.dataset.page === 'admin') {
   const status = (message, error = false) => { const node = document.querySelector('#adminStatus'); node.textContent = message; node.classList.toggle('is-error', error); };
   const request = async (url, options = {}) => { const response = await fetch(url, { credentials: 'same-origin', ...options, headers: { 'Content-Type': 'application/json', ...(options.headers || {}) } }); const data = await response.json(); if (!response.ok) throw new Error(data.error || 'Request failed.'); return data; };
   const escape = esc;
-  function renderLogin() { root.innerHTML = `<section class="admin-panel admin-login"><p class="admin-kicker">Divine Homam · CMS</p><h1>Admin sign in</h1><p>Sign in to manage puja services.</p><form id="loginForm"><label>Username<input name="username" autocomplete="username" required></label><label>Password<input name="password" type="password" autocomplete="current-password" required></label><button class="admin-button">Sign in</button></form><a href="/">← Back to website</a></section>`; root.querySelector('#loginForm').addEventListener('submit', async e => { e.preventDefault(); try { await request('/api/admin/login', { method: 'POST', body: JSON.stringify(Object.fromEntries(new FormData(e.currentTarget))) }); await renderDashboard(); } catch (error) { status(error.message, true); } }); }
+  function renderLogin() { root.innerHTML = `<section class="admin-panel admin-login"><p class="admin-kicker">Divine Homam · CMS</p><h1>Admin sign in</h1><p>Sign in to manage pujas and priests.</p><form id="loginForm"><label>Username<input name="username" autocomplete="username" required></label><label>Password<input name="password" type="password" autocomplete="current-password" required></label><button class="admin-button">Sign in</button></form><a href="/">← Back to website</a></section>`; root.querySelector('#loginForm').addEventListener('submit', async e => { e.preventDefault(); try { await request('/api/admin/login', { method: 'POST', body: JSON.stringify(Object.fromEntries(new FormData(e.currentTarget))) }); await renderDashboard(); } catch (error) { status(error.message, true); } }); }
   function formMarkup(puja = {}) {
     const points = puja.points || ['', '', ''];
     const images = Array.isArray(puja.image_urls) ? puja.image_urls.filter(isPujaImage) : [];
@@ -144,7 +160,8 @@ if (document.body.dataset.page === 'admin') {
   async function renderDashboard(edit = null) {
     try {
       const pujas = await request('/api/admin/pujas');
-      root.innerHTML = `<header class="admin-topbar"><div><p class="admin-kicker">Divine Homam · CMS</p><h1>Puja services</h1></div><button id="logout" class="admin-button admin-button-muted">Sign out</button></header><div class="admin-layout"><section class="admin-panel"><h2>${edit ? 'Edit puja' : 'Create a puja'}</h2>${formMarkup(edit || {})}</section><section class="admin-panel"><h2>Current pujas <span class="admin-count">${pujas.length}</span></h2><div class="admin-list">${pujas.map(p => `<article><div><strong>${escape(p.title)}</strong><span lang="ta">${escape(p.tamil_subtitle)}</span><small>${escape(p.package_type)} · ${escape(p.duration)}</small></div><div class="admin-actions"><button data-edit="${escape(p.slug)}" class="admin-button admin-button-muted">Edit</button><button data-delete="${escape(p.slug)}" class="admin-button admin-delete">Delete</button></div></article>`).join('')}</div></section></div>`;
+      root.innerHTML = `<header class="admin-topbar"><div><p class="admin-kicker">Divine Homam · CMS</p><h1>Puja services</h1></div><button id="logout" class="admin-button admin-button-muted">Sign out</button></header><nav class="admin-tabs" aria-label="CMS sections"><button type="button" class="admin-tab" aria-current="page">Pujas</button><button type="button" class="admin-tab" id="showPriests">Priests</button></nav><div class="admin-layout"><section class="admin-panel"><h2>${edit ? 'Edit puja' : 'Create a puja'}</h2>${formMarkup(edit || {})}</section><section class="admin-panel"><h2>Current pujas <span class="admin-count">${pujas.length}</span></h2><div class="admin-list">${pujas.map(p => `<article><div><strong>${escape(p.title)}</strong><span lang="ta">${escape(p.tamil_subtitle)}</span><small>${escape(p.package_type)} · ${escape(p.duration)}</small></div><div class="admin-actions"><button data-edit="${escape(p.slug)}" class="admin-button admin-button-muted">Edit</button><button data-delete="${escape(p.slug)}" class="admin-button admin-delete">Delete</button></div></article>`).join('')}</div></section></div>`;
+      root.querySelector('#showPriests').onclick = () => renderPriestDashboard();
       root.querySelector('#logout').onclick = async () => { await request('/api/admin/login', { method: 'DELETE' }); renderLogin(); };
       root.querySelector('#cancelEdit').onclick = () => renderDashboard();
       root.querySelectorAll('[data-edit]').forEach(button => button.onclick = () => renderDashboard(pujas.find(p => p.slug === button.dataset.edit)));
@@ -195,6 +212,52 @@ if (document.body.dataset.page === 'admin') {
       });
     } catch (error) { if (error.message.includes('sign in')) renderLogin(); else { renderLogin(); if (error.message !== 'Please sign in to manage pujas.') status(error.message, true); } }
   }
+  async function renderPriestDashboard(edit = null) {
+    try {
+      const priests = await request('/api/admin/priests');
+      root.innerHTML = `<header class="admin-topbar"><div><p class="admin-kicker">Divine Homam · CMS</p><h1>Our priests</h1></div><button id="logout" class="admin-button admin-button-muted">Sign out</button></header><nav class="admin-tabs" aria-label="CMS sections"><button type="button" class="admin-tab" id="showPujas">Pujas</button><button type="button" class="admin-tab" aria-current="page">Priests</button></nav><div class="admin-layout"><section class="admin-panel"><h2>${edit ? 'Edit priest' : 'Add a priest'}</h2><form id="priestForm" class="admin-form"><label class="wide">Name<input name="name" required minlength="2" maxlength="120" value="${escape(edit?.name || '')}"></label><label class="wide">Years of experience<input name="years_experience" type="number" min="0" max="80" step="1" required value="${escape(edit?.years_experience ?? '')}"></label><label class="wide">Description<textarea name="description" required minlength="10" maxlength="1000" rows="5">${escape(edit?.description || '')}</textarea></label><label class="wide">Photo<input id="priestPhotoFile" type="file" accept="image/avif,image/jpeg,image/png,image/webp"><small id="priestPhotoStatus">Upload one AVIF, JPEG, PNG, or WebP photo, up to 10 MB.</small></label><input type="hidden" name="photo_url" id="priestPhotoUrl" value="${escape(edit?.photo_url || '')}"><div id="priestPhotoPreview" class="wide">${edit?.photo_url && isPujaImage(edit.photo_url) ? `<img class="admin-priest-preview" src="${escape(edit.photo_url)}" alt="Current photo of ${escape(edit.name)}">` : ''}</div><div class="admin-form-actions wide"><button class="admin-button" type="submit">${edit ? 'Save changes' : 'Create priest'}</button><button class="admin-button admin-button-muted" type="button" id="cancelPriestEdit">Cancel</button></div></form></section><section class="admin-panel"><h2>Current priests <span class="admin-count">${priests.length}</span></h2><div class="admin-list">${priests.length ? priests.map(priest => `<article><img class="admin-priest-thumb" src="${escape(priest.photo_url)}" alt=""><div><strong>${escape(priest.name)}</strong><small>${escape(priest.years_experience)} years experience</small></div><div class="admin-actions"><button class="admin-button admin-button-muted" data-edit-priest="${escape(priest.id)}">Edit</button><button class="admin-button admin-delete" data-delete-priest="${escape(priest.id)}">Delete</button></div></article>`).join('') : '<p class="cms-empty">No priest profiles yet. Add the first one here.</p>'}</div></section></div>`;
+      root.querySelector('#logout').onclick = async () => { await request('/api/admin/login', { method: 'DELETE' }); renderLogin(); };
+      root.querySelector('#showPujas').onclick = () => renderDashboard();
+      root.querySelector('#cancelPriestEdit').onclick = () => renderPriestDashboard();
+      root.querySelectorAll('[data-edit-priest]').forEach(button => button.onclick = () => renderPriestDashboard(priests.find(priest => priest.id === button.dataset.editPriest)));
+      root.querySelectorAll('[data-delete-priest]').forEach(button => button.onclick = async () => {
+        if (!confirm('Delete this priest profile from the website?')) return;
+        try { await request(`/api/admin/priests?id=${encodeURIComponent(button.dataset.deletePriest)}`, { method: 'DELETE' }); status('Priest deleted.'); await renderPriestDashboard(); }
+        catch (error) { status(error.message, true); }
+      });
+      const form = root.querySelector('#priestForm');
+      const fileInput = root.querySelector('#priestPhotoFile');
+      const photoInput = root.querySelector('#priestPhotoUrl');
+      const preview = root.querySelector('#priestPhotoPreview');
+      const uploadStatus = root.querySelector('#priestPhotoStatus');
+      const submit = form.querySelector('button[type="submit"]');
+      fileInput.addEventListener('change', async () => {
+        const file = fileInput.files[0]; if (!file) return;
+        if (!/^image\/(avif|jpeg|png|webp)$/.test(file.type) || file.size > 10 * 1024 * 1024) { fileInput.value = ''; uploadStatus.textContent = 'Choose an AVIF, JPEG, PNG, or WebP image no larger than 10 MB.'; return; }
+        fileInput.disabled = true; submit.disabled = true; uploadStatus.textContent = 'Uploading photo to Cloudinary…';
+        try {
+          const signed = await request('/api/admin/cloudinary-signature?folder=priests', { method: 'POST' });
+          const upload = new FormData(); upload.append('file', file); upload.append('api_key', signed.api_key); upload.append('timestamp', String(signed.timestamp)); upload.append('signature', signed.signature); upload.append('folder', signed.folder); upload.append('allowed_formats', signed.allowed_formats);
+          const response = await fetch(`https://api.cloudinary.com/v1_1/${encodeURIComponent(signed.cloud_name)}/image/upload`, { method: 'POST', body: upload });
+          const result = await response.json();
+          if (!response.ok || !result.secure_url || !isPujaImage(result.secure_url)) throw new Error(result.error?.message || 'Cloudinary upload failed.');
+          photoInput.value = result.secure_url;
+          preview.innerHTML = `<img class="admin-priest-preview" src="${escape(result.secure_url)}" alt="New priest photo">`;
+          uploadStatus.textContent = 'Photo uploaded. Save the profile to publish it.';
+        } catch (error) { uploadStatus.textContent = `Upload failed: ${error.message}`; }
+        finally { fileInput.value = ''; fileInput.disabled = false; submit.disabled = false; }
+      });
+      form.addEventListener('submit', async event => {
+        event.preventDefault();
+        const data = Object.fromEntries(new FormData(form));
+        if (!data.photo_url) { uploadStatus.textContent = 'Upload a photo before saving this priest.'; return; }
+        submit.disabled = true;
+        try { await request(edit ? `/api/admin/priests?id=${encodeURIComponent(edit.id)}` : '/api/admin/priests', { method: edit ? 'PUT' : 'POST', body: JSON.stringify(data) }); status(edit ? 'Priest updated.' : 'Priest created.'); await renderPriestDashboard(); }
+        catch (error) { status(error.message, true); submit.disabled = false; }
+      });
+    } catch (error) { if (error.message.includes('sign in')) renderLogin(); else status(error.message, true); }
+  }
   (async () => { try { await request('/api/admin/pujas'); await renderDashboard(); } catch { renderLogin(); } })();
 }
 if (document.querySelector('#poojaGrid')) loadPujas();
+if (document.querySelector('#priestGrid')) loadPriests();

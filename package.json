@@ -8,6 +8,7 @@
     "dev": "npm run build && node server.mjs",
     "start": "node server.mjs",
     "check": "node --check public/app.js && node --check server.mjs",
+    "test:priests": "node --test scripts/test-priests.cjs",
     "test:browser": "node scripts/acceptance.mjs"
   },
   "devDependencies": {

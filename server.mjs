@@ -18,9 +18,11 @@ const dataRoot = path.resolve(process.env.BOOKINGS_DIR || path.join(root, 'data'
 const port = Number(process.env.PORT || 3000);
 const host = process.env.HOST || '127.0.0.1';
 const cmsPublic = (await import('./api/pujas.js')).default;
+const priestsPublic = (await import('./api/priests.js')).default;
 const cmsPujaPage = (await import('./api/puja-page.js')).default;
 const cmsLogin = (await import('./api/admin/login.js')).default;
 const cmsAdmin = (await import('./api/admin/pujas.js')).default;
+const priestsAdmin = (await import('./api/admin/priests.js')).default;
 const cloudinarySignature = (await import('./api/admin/cloudinary-signature.js')).default;
 const types = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'application/javascript; charset=utf-8', '.xml': 'application/xml; charset=utf-8', '.txt': 'text/plain; charset=utf-8', '.svg': 'image/svg+xml', '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.webp': 'image/webp', '.mp4': 'video/mp4', '.woff2': 'font/woff2', '.ttf': 'font/ttf', '.ico': 'image/x-icon' };
 const page = await readFile(path.join(publicRoot, 'index.html'), 'utf8');
@@ -55,8 +57,10 @@ const server = http.createServer(async (request, response) => {
     const pujaPage = url.pathname.match(/^\/puja\/([a-z0-9]+(?:-[a-z0-9]+)*)\/?$/);
     if (pujaPage) { request.query = { slug: pujaPage[1] }; return await cmsPujaPage(request, response); }
     if (url.pathname === '/api/pujas') return await cmsPublic(request, response);
+    if (url.pathname === '/api/priests') return await priestsPublic(request, response);
     if (url.pathname === '/api/admin/login') return await cmsLogin(request, response);
     if (url.pathname === '/api/admin/pujas') return await cmsAdmin(request, response);
+    if (url.pathname === '/api/admin/priests') return await priestsAdmin(request, response);
     if (url.pathname === '/api/admin/cloudinary-signature') return await cloudinarySignature(request, response);
     if (url.pathname === '/api/bookings' && request.method === 'POST') {
       if (request.headers.origin && new URL(request.headers.origin).host !== request.headers.host) return json(response, 403, { error: 'Please submit from this website.' });

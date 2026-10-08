@@ -1450,3 +1450,32 @@ body.seva-page {
 .cms-detail-visual{min-height:0;overflow:visible;border-radius:0;background:transparent}.cms-detail-gallery{display:grid;width:100%;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.cms-detail-photo{min-width:0;margin:0;overflow:hidden;border:1px solid rgba(202,138,4,.28);border-radius:12px;background:#f7ead0}.cms-detail-photo:first-child{grid-column:1/-1}.cms-detail-photo img{display:block;width:100%;aspect-ratio:4/3;object-fit:cover}.cms-detail-photo:first-child img{aspect-ratio:16/10}.cms-detail-image{width:100%;min-height:300px;border-radius:12px}.admin-image-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.admin-image-grid:empty{display:none}.admin-image-grid figure{position:relative;min-width:0;margin:0;overflow:hidden;border:1px solid #dfc8a5;border-radius:9px;background:#fff}.admin-image-grid img{display:block;width:100%;aspect-ratio:4/3;object-fit:cover}.admin-image-grid button{width:100%;min-height:38px;border:0;background:#fff0ef;color:#9f1d16;font:inherit;font-size:11px;font-weight:700;cursor:pointer}.admin-optional{display:inline;color:#795d57;font-size:11px;font-weight:500}.admin-topbar{flex-wrap:wrap}.admin-panel,.admin-layout,.admin-form{min-width:0}
 @media(max-width:820px){.cms-detail-hero{grid-template-columns:1fr}.cms-detail-visual{max-width:none}.admin-image-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
 @media(max-width:560px){.cms-detail-gallery{gap:7px}.cms-detail-photo{border-radius:8px}.cms-detail-image{min-height:210px}.admin-topbar{gap:12px}.admin-topbar h1{font-size:26px}.admin-topbar>.admin-button{min-height:44px}.admin-image-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.admin-image-grid button{min-height:44px}.admin-actions{width:100%}.admin-actions .admin-button{flex:1;min-height:44px}.admin-form-actions .admin-button{min-height:44px}.admin-list article{overflow-wrap:anywhere}.admin-status{right:12px;bottom:12px;left:12px;max-width:none}}
+
+.priest-section{padding:76px 0 88px;background:radial-gradient(circle at 88% 6%,rgba(239,191,102,.2),transparent 34%),#fffdf7;border-bottom:1px solid rgba(118,0,9,.12)}
+.priest-section-inner{width:min(1280px,calc(100% - 48px));margin:auto}
+.priest-section-heading{display:flex;align-items:end;justify-content:space-between;gap:32px;margin-bottom:32px}
+.priest-eyebrow{display:block;margin-bottom:9px;color:#a36920;font-size:12px;font-weight:800;letter-spacing:.16em;text-transform:uppercase}
+.priest-section-heading h2{margin:0;color:#760009;font-family:'Rozha One','Playfair Display',serif;font-size:clamp(34px,4vw,54px);line-height:1.1}
+.priest-section-heading p{max-width:440px;margin:0;color:#705651;font-size:15px;line-height:1.7}
+.priest-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px}
+.priest-card{min-width:0;overflow:hidden;border:1px solid rgba(166,113,39,.28);border-radius:18px;background:#fef9ee;box-shadow:0 12px 32px rgba(81,34,14,.07);transition:transform .25s,box-shadow .25s}
+.priest-card:hover{transform:translateY(-5px);box-shadow:0 18px 42px rgba(81,34,14,.13)}
+.priest-card-photo{position:relative;isolation:isolate;overflow:hidden;background:#ead9b9;aspect-ratio:16/9}
+.priest-card-photo .priest-card-backdrop{position:absolute;inset:-14px;width:calc(100% + 28px);height:calc(100% + 28px);object-fit:cover;filter:blur(16px);opacity:.62}
+.priest-card-photo::after{position:absolute;z-index:1;inset:0;background:linear-gradient(110deg,rgba(63,27,14,.18),rgba(255,248,233,.16));content:'';pointer-events:none}
+.priest-card-photo .priest-card-portrait{position:relative;z-index:2;display:block;width:100%;height:100%;object-fit:contain}
+.priest-card-body{padding:23px 24px 26px}
+.priest-card-top{display:flex;align-items:start;justify-content:space-between;gap:12px}
+.priest-card h3{margin:0;color:#760009;font-family:'Rozha One','Playfair Display',serif;font-size:25px;line-height:1.2}
+.priest-years{flex:none;padding:7px 10px;border:1px solid rgba(180,83,9,.22);border-radius:999px;background:#fff5dd;color:#8e460f;font-size:11px;font-weight:800;white-space:nowrap}
+.priest-card-body p{margin:13px 0 0;color:#66504a;font-size:14px;line-height:1.7;white-space:pre-line}
+.priest-message{grid-column:1/-1;margin:0;padding:28px;border:1px dashed #dbc49e;border-radius:12px;color:#705651;text-align:center}
+.admin-tabs{display:flex;gap:8px;margin:-8px 0 22px}
+.admin-tab{padding:10px 18px;border:1px solid #ddc49a;border-radius:8px;background:#fffdf7;color:#760009;font:inherit;font-size:13px;font-weight:800;cursor:pointer}
+.admin-tab[aria-current=page]{border-color:#760009;background:#760009;color:#fff}
+.admin-priest-thumb{width:52px;height:52px;flex:none;border-radius:8px;object-fit:cover}
+.admin-list article>img+div{display:grid;gap:3px;min-width:0;margin-right:auto}
+.admin-priest-preview{width:min(220px,100%);aspect-ratio:4/3;object-fit:cover;border-radius:10px;border:1px solid #dfc8a5}
+@media(max-width:900px){.priest-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:650px){.priest-section{padding:58px 0}.priest-section-inner{width:calc(100% - 32px)}.priest-section-heading{display:block}.priest-section-heading p{margin-top:12px}.priest-grid{grid-template-columns:1fr}.priest-card-body{padding:21px}}
+@media(prefers-reduced-motion:reduce){.priest-card{transition:none}.priest-card:hover{transform:none}}

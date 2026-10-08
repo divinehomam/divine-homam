@@ -36,6 +36,8 @@ CLOUDINARY_API_SECRET=your-server-only-cloudinary-api-secret
 
 For local work, put them in the ignored `.env` file. Never use a `NEXT_PUBLIC_` prefix for the service-role key or Cloudinary API secret. Visit `/admin.html` to sign in and create, edit, or delete catalog entries. Each entry requires its title, Tamil subtitle, badge, short description, three points, package type, and duration. Upload zero to five images through the Cloudinary upload control; the URLs are saved in Supabase, and the detail page displays the gallery. Admin sessions are HttpOnly, SameSite cookies and expire after eight hours.
 
+The **Priests** tab in `/admin.html` manages the homepage's "Meet Our Priests" cards. Apply `supabase/migrations/20261008000000_priests_cms.sql` in the Supabase SQL Editor before using it. Each profile has a name, years of experience, description, and one Cloudinary photo. The public cards load from the `priests` table through `/api/priests`; create, edit, and delete actions use authenticated server endpoints. The Cloudinary credentials in `.env` must authenticate successfully for photo uploads. Deleting a profile removes its database row; its Cloudinary image can be removed separately in Cloudinary.
+
 ## Booking requests
 
 The Node server validates requests and saves them privately as JSON in `data/bookings/`. Repeating the same submission uses an idempotency key to avoid duplicates. There is no public endpoint exposing requests. To use another storage directory set `BOOKINGS_DIR`; `HOST` and `PORT` are also configurable.
